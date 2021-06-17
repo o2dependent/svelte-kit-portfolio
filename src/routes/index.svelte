@@ -1,5 +1,5 @@
 <script context="module" lang="ts">
-	import Masonry from 'svelte-masonry';
+	import Masonry from 'svelte-masonry/Masonry.svelte';
 
 	export const prerender = true;
 	let refreshLayout;
