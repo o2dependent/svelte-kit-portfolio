@@ -1,6 +1,6 @@
 <script lang="ts">
 	let isPanelOpen = false;
-	$: document.body.style.overflowY = isPanelOpen ? 'hidden' : '';
+	$: document ? (document.body.style.overflowY = isPanelOpen ? 'hidden' : '') : null;
 </script>
 
 <div class="profile-panel {isPanelOpen ? 'open' : ''}">
