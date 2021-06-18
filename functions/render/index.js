@@ -1379,7 +1379,7 @@ function writable(value, start = noop) {
   function update2(fn) {
     set(fn(value));
   }
-  function subscribe(run2, invalidate = noop) {
+  function subscribe2(run2, invalidate = noop) {
     const subscriber = [run2, invalidate];
     subscribers.push(subscriber);
     if (subscribers.length === 1) {
@@ -1397,7 +1397,7 @@ function writable(value, start = noop) {
       }
     };
   }
-  return { set, update: update2, subscribe };
+  return { set, update: update2, subscribe: subscribe2 };
 }
 function hash(value) {
   let hash2 = 5381;
@@ -2321,6 +2321,9 @@ function run_all(fns) {
 function is_function(thing) {
   return typeof thing === "function";
 }
+function safe_not_equal2(a, b) {
+  return a != a ? b == b : a !== b || (a && typeof a === "object" || typeof a === "function");
+}
 function is_empty(obj) {
   return Object.keys(obj).length === 0;
 }
@@ -2588,6 +2591,54 @@ function v4() {
   return out;
 }
 
+// node_modules/svelte/store/index.mjs
+var subscriber_queue2 = [];
+function writable2(value, start = noop2) {
+  let stop;
+  const subscribers = [];
+  function set(new_value) {
+    if (safe_not_equal2(value, new_value)) {
+      value = new_value;
+      if (stop) {
+        const run_queue = !subscriber_queue2.length;
+        for (let i = 0; i < subscribers.length; i += 1) {
+          const s2 = subscribers[i];
+          s2[1]();
+          subscriber_queue2.push(s2, value);
+        }
+        if (run_queue) {
+          for (let i = 0; i < subscriber_queue2.length; i += 2) {
+            subscriber_queue2[i][0](subscriber_queue2[i + 1]);
+          }
+          subscriber_queue2.length = 0;
+        }
+      }
+    }
+  }
+  function update2(fn) {
+    set(fn(value));
+  }
+  function subscribe2(run2, invalidate = noop2) {
+    const subscriber = [run2, invalidate];
+    subscribers.push(subscriber);
+    if (subscribers.length === 1) {
+      stop = start(set) || noop2;
+    }
+    run2(value);
+    return () => {
+      const index2 = subscribers.indexOf(subscriber);
+      if (index2 !== -1) {
+        subscribers.splice(index2, 1);
+      }
+      if (subscribers.length === 0) {
+        stop();
+        stop = null;
+      }
+    };
+  }
+  return { set, update: update2, subscribe: subscribe2 };
+}
+
 // .svelte-kit/output/server/app.js
 var css$6 = {
   code: "#svelte-announcer.svelte-1j55zn5{position:absolute;left:0;top:0;clip:rect(0 0 0 0);clip-path:inset(50%);overflow:hidden;white-space:nowrap;width:1px;height:1px}",
@@ -2672,9 +2723,9 @@ function init(settings) {
     amp: false,
     dev: false,
     entry: {
-      file: "/./_app/start-279bc53e.js",
+      file: "/./_app/start-d68f5ae7.js",
       css: ["/./_app/assets/start-a8cd1609.css", "/./_app/assets/vendor-436f133f.css"],
-      js: ["/./_app/start-279bc53e.js", "/./_app/chunks/vendor-e5116ec1.js"]
+      js: ["/./_app/start-d68f5ae7.js", "/./_app/chunks/vendor-6cfc7907.js"]
     },
     fetched: void 0,
     floc: false,
@@ -2766,7 +2817,7 @@ var module_lookup = {
     return index;
   })
 };
-var metadata_lookup = { "src/routes/__layout.svelte": { "entry": "/./_app/pages/__layout.svelte-368841b3.js", "css": ["/./_app/assets/pages/__layout.svelte-4ae9be36.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/__layout.svelte-368841b3.js", "/./_app/chunks/vendor-e5116ec1.js"], "styles": null }, ".svelte-kit/build/components/error.svelte": { "entry": "/./_app/error.svelte-eb67f81a.js", "css": ["/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/error.svelte-eb67f81a.js", "/./_app/chunks/vendor-e5116ec1.js"], "styles": null }, "src/routes/index.svelte": { "entry": "/./_app/pages/index.svelte-3669f103.js", "css": ["/./_app/assets/pages/index.svelte-3756355c.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/index.svelte-3669f103.js", "/./_app/chunks/vendor-e5116ec1.js"], "styles": null }, "src/routes/about.svelte": { "entry": "/./_app/pages/about.svelte-418f2fb3.js", "css": ["/./_app/assets/pages/about.svelte-0cd840a0.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/about.svelte-418f2fb3.js", "/./_app/chunks/vendor-e5116ec1.js"], "styles": null }, "src/routes/todos/index.svelte": { "entry": "/./_app/pages/todos/index.svelte-cffc8eb4.js", "css": ["/./_app/assets/pages/todos/index.svelte-ef0435f2.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/todos/index.svelte-cffc8eb4.js", "/./_app/chunks/vendor-e5116ec1.js"], "styles": null } };
+var metadata_lookup = { "src/routes/__layout.svelte": { "entry": "/./_app/pages/__layout.svelte-d0b3665e.js", "css": ["/./_app/assets/pages/__layout.svelte-8f5e6938.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/__layout.svelte-d0b3665e.js", "/./_app/chunks/vendor-6cfc7907.js"], "styles": null }, ".svelte-kit/build/components/error.svelte": { "entry": "/./_app/error.svelte-7c70e56d.js", "css": ["/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/error.svelte-7c70e56d.js", "/./_app/chunks/vendor-6cfc7907.js"], "styles": null }, "src/routes/index.svelte": { "entry": "/./_app/pages/index.svelte-2ac871df.js", "css": ["/./_app/assets/pages/index.svelte-3756355c.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/index.svelte-2ac871df.js", "/./_app/chunks/vendor-6cfc7907.js"], "styles": null }, "src/routes/about.svelte": { "entry": "/./_app/pages/about.svelte-7da5d0c8.js", "css": ["/./_app/assets/pages/about.svelte-0cd840a0.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/about.svelte-7da5d0c8.js", "/./_app/chunks/vendor-6cfc7907.js"], "styles": null }, "src/routes/todos/index.svelte": { "entry": "/./_app/pages/todos/index.svelte-f2ff187e.js", "css": ["/./_app/assets/pages/todos/index.svelte-ef0435f2.css", "/./_app/assets/vendor-436f133f.css"], "js": ["/./_app/pages/todos/index.svelte-f2ff187e.js", "/./_app/chunks/vendor-6cfc7907.js"], "styles": null } };
 async function load_component(file) {
   return {
     module: await module_lookup[file](),
@@ -2839,67 +2890,43 @@ var _uid__json = /* @__PURE__ */ Object.freeze({
   patch,
   del
 });
+var drawerStore = writable2(false);
 var css$5 = {
-  code: ".profile-panel.svelte-110kyb5.svelte-110kyb5{background-color:var(--tertiary-color);width:350px;max-width:100vw;min-height:100vh;height:100%;padding:2rem;padding-top:28px;display:flex;flex-direction:column;gap:0.5rem;position:sticky;top:0}.mobile-nav.svelte-110kyb5.svelte-110kyb5{display:none}@media screen and (max-width: 768px){.mobile-nav.svelte-110kyb5.svelte-110kyb5{z-index:9999;all:unset;border-radius:9999px;display:flex;justify-content:center;align-items:center;position:fixed;bottom:0.5rem;right:0.5rem;height:3rem;width:3rem;background-color:var(--tertiary-color);box-shadow:0 0 5px #00000040}.profile-panel.svelte-110kyb5.svelte-110kyb5{position:fixed;left:-100vw;width:100vw;transition:left 300ms ease-out;box-shadow:0 0 3px #00000040}.profile-panel.open.svelte-110kyb5.svelte-110kyb5{left:0}}.page-links.svelte-110kyb5.svelte-110kyb5{display:flex;flex-direction:column;gap:0.25rem}a.svelte-110kyb5.svelte-110kyb5{text-decoration:none}.page-links.svelte-110kyb5 a .bullet.svelte-110kyb5{margin-right:0;transition:margin 300ms ease}.page-links.svelte-110kyb5 a:hover .bullet.svelte-110kyb5{margin-right:0.25rem}.social-links.svelte-110kyb5.svelte-110kyb5{margin-top:1rem;display:flex;gap:0.5rem}.social.svelte-110kyb5.svelte-110kyb5{color:var(--tertiary-color);background-color:var(--accent-color);opacity:0.6;border-radius:9999px;box-shadow:0 0 2px #00000020;display:flex;justify-content:center;align-items:center;height:2.25rem;width:2.25rem;transition:opacity 300ms ease}.social.svelte-110kyb5.svelte-110kyb5:hover{opacity:1}.header-link.svelte-110kyb5.svelte-110kyb5{font-size:1.15rem;font-weight:700;margin:0;text-transform:uppercase}p.svelte-110kyb5.svelte-110kyb5{margin:0;opacity:0.9}",
-  map: `{"version":3,"file":"index.svelte","sources":["index.svelte"],"sourcesContent":["<script lang=\\"ts\\">var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {\\n    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }\\n    return new (P || (P = Promise))(function (resolve, reject) {\\n        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }\\n        function rejected(value) { try { step(generator[\\"throw\\"](value)); } catch (e) { reject(e); } }\\n        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }\\n        step((generator = generator.apply(thisArg, _arguments || [])).next());\\n    });\\n};\\nimport { onMount } from 'svelte';\\nlet isPanelOpen = false;\\nlet i = null;\\nexport function load(p) {\\n    return __awaiter(this, void 0, void 0, function* () {\\n        console.log(p);\\n        i = p;\\n    });\\n}\\nlet toggleScroll = (isPanelOpen) => null;\\nonMount(() => {\\n    toggleScroll = (isPanelOpen) => (document.body.style.overflowY = isPanelOpen ? 'hidden' : '');\\n});\\n$: toggleScroll(isPanelOpen);\\n<\/script>\\n\\n<div class=\\"profile-panel {isPanelOpen ? 'open' : ''}\\">\\n\\t<a class=\\"header-link\\" href=\\"/\\">Ethan Olsen</a>\\n\\t<p>\\n\\t\\tI am a full-stack web developer proficient in React and Typescript to build stable and\\n\\t\\tperformant web and mobile applications.\\n\\t</p>\\n\\n\\t<div class=\\"page-links\\">\\n\\t\\t<a on:click={() => (isPanelOpen = false)} href=\\"/\\"\\n\\t\\t\\t><span class=\\"bullet\\">\u2970</span> <span class=\\"text\\">Home</span></a\\n\\t\\t>\\n\\t\\t<a on:click={() => (isPanelOpen = false)} href=\\"/about\\"\\n\\t\\t\\t><span class=\\"bullet\\">\u2970</span> <span class=\\"text\\">About </span></a\\n\\t\\t>\\n\\t</div>\\n\\n\\t<div class=\\"social-links\\">\\n\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t<svg\\n\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\td=\\"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z\\"\\n\\t\\t\\t\\t/></svg\\n\\t\\t\\t>\\n\\t\\t</a>\\n\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t<svg\\n\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\td=\\"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z\\"\\n\\t\\t\\t\\t/></svg\\n\\t\\t\\t>\\n\\t\\t</a>\\n\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t<svg\\n\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\td=\\"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-3 7h-1.924c-.615 0-1.076.252-1.076.889v1.111h3l-.238 3h-2.762v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z\\"\\n\\t\\t\\t\\t/></svg\\n\\t\\t\\t>\\n\\t\\t</a>\\n\\t</div>\\n</div>\\n\\n<button class=\\"mobile-nav\\" on:click={() => (isPanelOpen = !isPanelOpen)}\\n\\t><svg\\n\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\twidth=\\"50%\\"\\n\\t\\theight=\\"50%\\"\\n\\t\\tfill-rule=\\"evenodd\\"\\n\\t\\tclip-rule=\\"evenodd\\"\\n\\t\\t><path d=\\"M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z\\" fill=\\"#1040e2\\" /><path\\n\\t\\t\\td=\\"M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z\\"\\n\\t\\t/></svg\\n\\t>\\n</button>\\n\\n<style>\\n\\t.profile-panel {\\n\\t\\tbackground-color: var(--tertiary-color);\\n\\t\\twidth: 350px;\\n\\t\\tmax-width: 100vw;\\n\\t\\tmin-height: 100vh;\\n\\t\\theight: 100%;\\n\\t\\tpadding: 2rem;\\n\\t\\tpadding-top: 28px;\\n\\t\\tdisplay: flex;\\n\\t\\tflex-direction: column;\\n\\t\\tgap: 0.5rem;\\n\\t\\tposition: sticky;\\n\\t\\ttop: 0;\\n\\t}\\n\\t.mobile-nav {\\n\\t\\tdisplay: none;\\n\\t}\\n\\t@media screen and (max-width: 768px) {\\n\\t\\t.mobile-nav {\\n\\t\\t\\tz-index: 9999;\\n\\t\\t\\tall: unset;\\n\\t\\t\\tborder-radius: 9999px;\\n\\t\\t\\tdisplay: flex;\\n\\t\\t\\tjustify-content: center;\\n\\t\\t\\talign-items: center;\\n\\t\\t\\tposition: fixed;\\n\\t\\t\\tbottom: 0.5rem;\\n\\t\\t\\tright: 0.5rem;\\n\\t\\t\\theight: 3rem;\\n\\t\\t\\twidth: 3rem;\\n\\t\\t\\tbackground-color: var(--tertiary-color);\\n\\t\\t\\tbox-shadow: 0 0 5px #00000040;\\n\\t\\t}\\n\\n\\t\\t.profile-panel {\\n\\t\\t\\tposition: fixed;\\n\\t\\t\\tleft: -100vw;\\n\\t\\t\\twidth: 100vw;\\n\\t\\t\\ttransition: left 300ms ease-out;\\n\\t\\t\\tbox-shadow: 0 0 3px #00000040;\\n\\t\\t}\\n\\n\\t\\t.profile-panel.open {\\n\\t\\t\\tleft: 0;\\n\\t\\t}\\n\\t}\\n\\n\\t.page-links {\\n\\t\\tdisplay: flex;\\n\\t\\tflex-direction: column;\\n\\t\\tgap: 0.25rem;\\n\\t}\\n\\ta {\\n\\t\\ttext-decoration: none;\\n\\t}\\n\\t.page-links a .bullet {\\n\\t\\tmargin-right: 0;\\n\\t\\ttransition: margin 300ms ease;\\n\\t}\\n\\t.page-links a:hover .bullet {\\n\\t\\tmargin-right: 0.25rem;\\n\\t}\\n\\n\\t.social-links {\\n\\t\\tmargin-top: 1rem;\\n\\t\\tdisplay: flex;\\n\\t\\tgap: 0.5rem;\\n\\t}\\n\\t.social {\\n\\t\\tcolor: var(--tertiary-color);\\n\\t\\tbackground-color: var(--accent-color);\\n\\t\\topacity: 0.6;\\n\\t\\tborder-radius: 9999px;\\n\\t\\tbox-shadow: 0 0 2px #00000020;\\n\\t\\tdisplay: flex;\\n\\t\\tjustify-content: center;\\n\\t\\talign-items: center;\\n\\t\\theight: 2.25rem;\\n\\t\\twidth: 2.25rem;\\n\\t\\ttransition: opacity 300ms ease;\\n\\t}\\n\\t.social:hover {\\n\\t\\topacity: 1;\\n\\t}\\n\\t.header-link {\\n\\t\\tfont-size: 1.15rem;\\n\\t\\tfont-weight: 700;\\n\\t\\tmargin: 0;\\n\\t\\ttext-transform: uppercase;\\n\\t}\\n\\tp {\\n\\t\\tmargin: 0;\\n\\t\\topacity: 0.9;\\n\\t}\\n</style>\\n"],"names":[],"mappings":"AA+FC,cAAc,8BAAC,CAAC,AACf,gBAAgB,CAAE,IAAI,gBAAgB,CAAC,CACvC,KAAK,CAAE,KAAK,CACZ,SAAS,CAAE,KAAK,CAChB,UAAU,CAAE,KAAK,CACjB,MAAM,CAAE,IAAI,CACZ,OAAO,CAAE,IAAI,CACb,WAAW,CAAE,IAAI,CACjB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,GAAG,CAAE,MAAM,CACX,QAAQ,CAAE,MAAM,CAChB,GAAG,CAAE,CAAC,AACP,CAAC,AACD,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,AACd,CAAC,AACD,OAAO,MAAM,CAAC,GAAG,CAAC,YAAY,KAAK,CAAC,AAAC,CAAC,AACrC,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,KAAK,CACV,aAAa,CAAE,MAAM,CACrB,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MAAM,CACnB,QAAQ,CAAE,KAAK,CACf,MAAM,CAAE,MAAM,CACd,KAAK,CAAE,MAAM,CACb,MAAM,CAAE,IAAI,CACZ,KAAK,CAAE,IAAI,CACX,gBAAgB,CAAE,IAAI,gBAAgB,CAAC,CACvC,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,AAC9B,CAAC,AAED,cAAc,8BAAC,CAAC,AACf,QAAQ,CAAE,KAAK,CACf,IAAI,CAAE,MAAM,CACZ,KAAK,CAAE,KAAK,CACZ,UAAU,CAAE,IAAI,CAAC,KAAK,CAAC,QAAQ,CAC/B,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,AAC9B,CAAC,AAED,cAAc,KAAK,8BAAC,CAAC,AACpB,IAAI,CAAE,CAAC,AACR,CAAC,AACF,CAAC,AAED,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,GAAG,CAAE,OAAO,AACb,CAAC,AACD,CAAC,8BAAC,CAAC,AACF,eAAe,CAAE,IAAI,AACtB,CAAC,AACD,0BAAW,CAAC,CAAC,CAAC,OAAO,eAAC,CAAC,AACtB,YAAY,CAAE,CAAC,CACf,UAAU,CAAE,MAAM,CAAC,KAAK,CAAC,IAAI,AAC9B,CAAC,AACD,0BAAW,CAAC,CAAC,MAAM,CAAC,OAAO,eAAC,CAAC,AAC5B,YAAY,CAAE,OAAO,AACtB,CAAC,AAED,aAAa,8BAAC,CAAC,AACd,UAAU,CAAE,IAAI,CAChB,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,MAAM,AACZ,CAAC,AACD,OAAO,8BAAC,CAAC,AACR,KAAK,CAAE,IAAI,gBAAgB,CAAC,CAC5B,gBAAgB,CAAE,IAAI,cAAc,CAAC,CACrC,OAAO,CAAE,GAAG,CACZ,aAAa,CAAE,MAAM,CACrB,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,CAC7B,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MAAM,CACnB,MAAM,CAAE,OAAO,CACf,KAAK,CAAE,OAAO,CACd,UAAU,CAAE,OAAO,CAAC,KAAK,CAAC,IAAI,AAC/B,CAAC,AACD,qCAAO,MAAM,AAAC,CAAC,AACd,OAAO,CAAE,CAAC,AACX,CAAC,AACD,YAAY,8BAAC,CAAC,AACb,SAAS,CAAE,OAAO,CAClB,WAAW,CAAE,GAAG,CAChB,MAAM,CAAE,CAAC,CACT,cAAc,CAAE,SAAS,AAC1B,CAAC,AACD,CAAC,8BAAC,CAAC,AACF,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,GAAG,AACb,CAAC"}`
+  code: ".profile-panel.svelte-1hnllqq.svelte-1hnllqq{background-color:var(--tertiary-color);width:350px;max-width:100vw;min-height:100vh;height:100%;padding:2rem;padding-top:28px;display:flex;flex-direction:column;gap:0.5rem;position:sticky;top:0}.mobile-nav.svelte-1hnllqq.svelte-1hnllqq{display:none}@media screen and (max-width: 768px){.mobile-nav.svelte-1hnllqq.svelte-1hnllqq{z-index:9999;all:unset;border-radius:9999px;display:flex;justify-content:center;align-items:center;position:fixed;bottom:0.5rem;right:0.5rem;height:3rem;width:3rem;background-color:var(--tertiary-color);box-shadow:0 0 5px #00000040}.profile-panel.svelte-1hnllqq.svelte-1hnllqq{position:fixed;left:0;transition:left 300ms ease-out;box-shadow:0 0 3px #00000040}}.page-links.svelte-1hnllqq.svelte-1hnllqq{display:flex;flex-direction:column;gap:0.25rem}a.svelte-1hnllqq.svelte-1hnllqq{text-decoration:none}.page-links.svelte-1hnllqq a .bullet.svelte-1hnllqq{margin-right:0;transition:margin 300ms ease}.page-links.svelte-1hnllqq a:hover .bullet.svelte-1hnllqq{margin-right:0.25rem}.social-links.svelte-1hnllqq.svelte-1hnllqq{margin-top:1rem;display:flex;gap:0.5rem}.social.svelte-1hnllqq.svelte-1hnllqq{color:var(--tertiary-color);background-color:var(--accent-color);opacity:0.6;border-radius:9999px;box-shadow:0 0 2px #00000020;display:flex;justify-content:center;align-items:center;height:2.25rem;width:2.25rem;transition:opacity 300ms ease}.social.svelte-1hnllqq.svelte-1hnllqq:hover{opacity:1}.header-link.svelte-1hnllqq.svelte-1hnllqq{font-size:1.15rem;font-weight:700;margin:0;text-transform:uppercase}p.svelte-1hnllqq.svelte-1hnllqq{margin:0;opacity:0.9}",
+  map: `{"version":3,"file":"index.svelte","sources":["index.svelte"],"sourcesContent":["<script lang=\\"ts\\">import { fly, slide, scale } from 'svelte/transition';\\nimport { bounceOut, cubicIn, cubicInOut, circOut } from 'svelte/easing';\\nimport { onMount } from 'svelte';\\nimport { drawerStore } from '../../stores/drawerStore';\\nlet i = null;\\nlet isDrawerOpen;\\ndrawerStore.subscribe((val) => {\\n    isDrawerOpen = val;\\n});\\nconst toggleDrawer = (val) => {\\n    if (typeof val === 'undefined') {\\n        drawerStore.update(() => !isDrawerOpen);\\n    }\\n    else {\\n        drawerStore.update(() => val);\\n    }\\n};\\nlet windowWidth = 0;\\nlet toggleScroll = (isDrawerOpen) => null;\\nonMount(() => {\\n    toggleScroll = (isDrawerOpen) => (document.body.style.overflowY = isDrawerOpen ? 'hidden' : '');\\n    windowWidth = window.innerWidth;\\n    window.addEventListener('resize', (e) => {\\n        var _a;\\n        // @ts-ignore\\n        windowWidth = (_a = e === null || e === void 0 ? void 0 : e.target) === null || _a === void 0 ? void 0 : _a.innerWidth;\\n    });\\n});\\n$: toggleScroll(isDrawerOpen);\\n<\/script>\\n\\n{#if isDrawerOpen || windowWidth > 768}\\n\\t<div transition:fly={{ x: -400, easing: circOut }} class=\\"profile-panel\\">\\n\\t\\t<a class=\\"header-link\\" href=\\"/\\">Ethan Olsen</a>\\n\\t\\t<p>\\n\\t\\t\\tI am a full-stack web developer proficient in React and Typescript to build stable and\\n\\t\\t\\tperformant web and mobile applications.\\n\\t\\t</p>\\n\\n\\t\\t<div class=\\"page-links\\">\\n\\t\\t\\t<a on:click={() => toggleDrawer(false)} href=\\"/\\"\\n\\t\\t\\t\\t><span class=\\"bullet\\">\u2970</span> <span class=\\"text\\">Home</span></a\\n\\t\\t\\t>\\n\\t\\t\\t<a on:click={() => toggleDrawer(false)} href=\\"/about\\"\\n\\t\\t\\t\\t><span class=\\"bullet\\">\u2970</span> <span class=\\"text\\">About </span></a\\n\\t\\t\\t>\\n\\t\\t</div>\\n\\n\\t\\t<div class=\\"social-links\\">\\n\\t\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t\\t<svg\\n\\t\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\t\\td=\\"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z\\"\\n\\t\\t\\t\\t\\t/></svg\\n\\t\\t\\t\\t>\\n\\t\\t\\t</a>\\n\\t\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t\\t<svg\\n\\t\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\t\\td=\\"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z\\"\\n\\t\\t\\t\\t\\t/></svg\\n\\t\\t\\t\\t>\\n\\t\\t\\t</a>\\n\\t\\t\\t<a class=\\"social\\" href=\\"#\\">\\n\\t\\t\\t\\t<svg\\n\\t\\t\\t\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\t\\t\\t\\tfill=\\"currentColor\\"\\n\\t\\t\\t\\t\\twidth=\\"60%\\"\\n\\t\\t\\t\\t\\theight=\\"60%\\"\\n\\t\\t\\t\\t\\tviewBox=\\"0 0 24 24\\"\\n\\t\\t\\t\\t\\t><path\\n\\t\\t\\t\\t\\t\\td=\\"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-3 7h-1.924c-.615 0-1.076.252-1.076.889v1.111h3l-.238 3h-2.762v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z\\"\\n\\t\\t\\t\\t\\t/></svg\\n\\t\\t\\t\\t>\\n\\t\\t\\t</a>\\n\\t\\t</div>\\n\\t</div>\\n{/if}\\n\\n<button class=\\"mobile-nav\\" on:click={() => toggleDrawer()}\\n\\t><svg\\n\\t\\txmlns=\\"http://www.w3.org/2000/svg\\"\\n\\t\\twidth=\\"50%\\"\\n\\t\\theight=\\"50%\\"\\n\\t\\tfill-rule=\\"evenodd\\"\\n\\t\\tclip-rule=\\"evenodd\\"\\n\\t\\t><path d=\\"M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z\\" fill=\\"#1040e2\\" /><path\\n\\t\\t\\td=\\"M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z\\"\\n\\t\\t/></svg\\n\\t>\\n</button>\\n\\n<style>\\n\\t.profile-panel {\\n\\t\\tbackground-color: var(--tertiary-color);\\n\\t\\twidth: 350px;\\n\\t\\tmax-width: 100vw;\\n\\t\\tmin-height: 100vh;\\n\\t\\theight: 100%;\\n\\t\\tpadding: 2rem;\\n\\t\\tpadding-top: 28px;\\n\\t\\tdisplay: flex;\\n\\t\\tflex-direction: column;\\n\\t\\tgap: 0.5rem;\\n\\t\\tposition: sticky;\\n\\t\\ttop: 0;\\n\\t}\\n\\t.mobile-nav {\\n\\t\\tdisplay: none;\\n\\t}\\n\\t@media screen and (max-width: 768px) {\\n\\t\\t.mobile-nav {\\n\\t\\t\\tz-index: 9999;\\n\\t\\t\\tall: unset;\\n\\t\\t\\tborder-radius: 9999px;\\n\\t\\t\\tdisplay: flex;\\n\\t\\t\\tjustify-content: center;\\n\\t\\t\\talign-items: center;\\n\\t\\t\\tposition: fixed;\\n\\t\\t\\tbottom: 0.5rem;\\n\\t\\t\\tright: 0.5rem;\\n\\t\\t\\theight: 3rem;\\n\\t\\t\\twidth: 3rem;\\n\\t\\t\\tbackground-color: var(--tertiary-color);\\n\\t\\t\\tbox-shadow: 0 0 5px #00000040;\\n\\t\\t}\\n\\n\\t\\t.profile-panel {\\n\\t\\t\\tposition: fixed;\\n\\t\\t\\tleft: 0;\\n\\t\\t\\ttransition: left 300ms ease-out;\\n\\t\\t\\tbox-shadow: 0 0 3px #00000040;\\n\\t\\t}\\n\\n\\t\\t.profile-panel.open {\\n\\t\\t\\tleft: 0;\\n\\t\\t}\\n\\t}\\n\\n\\t.page-links {\\n\\t\\tdisplay: flex;\\n\\t\\tflex-direction: column;\\n\\t\\tgap: 0.25rem;\\n\\t}\\n\\ta {\\n\\t\\ttext-decoration: none;\\n\\t}\\n\\t.page-links a .bullet {\\n\\t\\tmargin-right: 0;\\n\\t\\ttransition: margin 300ms ease;\\n\\t}\\n\\t.page-links a:hover .bullet {\\n\\t\\tmargin-right: 0.25rem;\\n\\t}\\n\\n\\t.social-links {\\n\\t\\tmargin-top: 1rem;\\n\\t\\tdisplay: flex;\\n\\t\\tgap: 0.5rem;\\n\\t}\\n\\t.social {\\n\\t\\tcolor: var(--tertiary-color);\\n\\t\\tbackground-color: var(--accent-color);\\n\\t\\topacity: 0.6;\\n\\t\\tborder-radius: 9999px;\\n\\t\\tbox-shadow: 0 0 2px #00000020;\\n\\t\\tdisplay: flex;\\n\\t\\tjustify-content: center;\\n\\t\\talign-items: center;\\n\\t\\theight: 2.25rem;\\n\\t\\twidth: 2.25rem;\\n\\t\\ttransition: opacity 300ms ease;\\n\\t}\\n\\t.social:hover {\\n\\t\\topacity: 1;\\n\\t}\\n\\t.header-link {\\n\\t\\tfont-size: 1.15rem;\\n\\t\\tfont-weight: 700;\\n\\t\\tmargin: 0;\\n\\t\\ttext-transform: uppercase;\\n\\t}\\n\\tp {\\n\\t\\tmargin: 0;\\n\\t\\topacity: 0.9;\\n\\t}\\n</style>\\n"],"names":[],"mappings":"AAuGC,cAAc,8BAAC,CAAC,AACf,gBAAgB,CAAE,IAAI,gBAAgB,CAAC,CACvC,KAAK,CAAE,KAAK,CACZ,SAAS,CAAE,KAAK,CAChB,UAAU,CAAE,KAAK,CACjB,MAAM,CAAE,IAAI,CACZ,OAAO,CAAE,IAAI,CACb,WAAW,CAAE,IAAI,CACjB,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,GAAG,CAAE,MAAM,CACX,QAAQ,CAAE,MAAM,CAChB,GAAG,CAAE,CAAC,AACP,CAAC,AACD,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,AACd,CAAC,AACD,OAAO,MAAM,CAAC,GAAG,CAAC,YAAY,KAAK,CAAC,AAAC,CAAC,AACrC,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,KAAK,CACV,aAAa,CAAE,MAAM,CACrB,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MAAM,CACnB,QAAQ,CAAE,KAAK,CACf,MAAM,CAAE,MAAM,CACd,KAAK,CAAE,MAAM,CACb,MAAM,CAAE,IAAI,CACZ,KAAK,CAAE,IAAI,CACX,gBAAgB,CAAE,IAAI,gBAAgB,CAAC,CACvC,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,AAC9B,CAAC,AAED,cAAc,8BAAC,CAAC,AACf,QAAQ,CAAE,KAAK,CACf,IAAI,CAAE,CAAC,CACP,UAAU,CAAE,IAAI,CAAC,KAAK,CAAC,QAAQ,CAC/B,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,AAC9B,CAAC,AAKF,CAAC,AAED,WAAW,8BAAC,CAAC,AACZ,OAAO,CAAE,IAAI,CACb,cAAc,CAAE,MAAM,CACtB,GAAG,CAAE,OAAO,AACb,CAAC,AACD,CAAC,8BAAC,CAAC,AACF,eAAe,CAAE,IAAI,AACtB,CAAC,AACD,0BAAW,CAAC,CAAC,CAAC,OAAO,eAAC,CAAC,AACtB,YAAY,CAAE,CAAC,CACf,UAAU,CAAE,MAAM,CAAC,KAAK,CAAC,IAAI,AAC9B,CAAC,AACD,0BAAW,CAAC,CAAC,MAAM,CAAC,OAAO,eAAC,CAAC,AAC5B,YAAY,CAAE,OAAO,AACtB,CAAC,AAED,aAAa,8BAAC,CAAC,AACd,UAAU,CAAE,IAAI,CAChB,OAAO,CAAE,IAAI,CACb,GAAG,CAAE,MAAM,AACZ,CAAC,AACD,OAAO,8BAAC,CAAC,AACR,KAAK,CAAE,IAAI,gBAAgB,CAAC,CAC5B,gBAAgB,CAAE,IAAI,cAAc,CAAC,CACrC,OAAO,CAAE,GAAG,CACZ,aAAa,CAAE,MAAM,CACrB,UAAU,CAAE,CAAC,CAAC,CAAC,CAAC,GAAG,CAAC,SAAS,CAC7B,OAAO,CAAE,IAAI,CACb,eAAe,CAAE,MAAM,CACvB,WAAW,CAAE,MAAM,CACnB,MAAM,CAAE,OAAO,CACf,KAAK,CAAE,OAAO,CACd,UAAU,CAAE,OAAO,CAAC,KAAK,CAAC,IAAI,AAC/B,CAAC,AACD,qCAAO,MAAM,AAAC,CAAC,AACd,OAAO,CAAE,CAAC,AACX,CAAC,AACD,YAAY,8BAAC,CAAC,AACb,SAAS,CAAE,OAAO,CAClB,WAAW,CAAE,GAAG,CAChB,MAAM,CAAE,CAAC,CACT,cAAc,CAAE,SAAS,AAC1B,CAAC,AACD,CAAC,8BAAC,CAAC,AACF,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,GAAG,AACb,CAAC"}`
 };
 var AboutProfile = create_ssr_component(($$result, $$props, $$bindings, slots) => {
-  var __awaiter2 = function(thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P ? value : new P(function(resolve2) {
-        resolve2(value);
-      });
-    }
-    return new (P || (P = Promise))(function(resolve2, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator["throw"](value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function step(result) {
-        result.done ? resolve2(result.value) : adopt(result.value).then(fulfilled, rejected);
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-  };
-  let isPanelOpen = false;
-  function load2(p) {
-    return __awaiter2(this, void 0, void 0, function* () {
-      console.log(p);
-    });
-  }
-  let toggleScroll = (isPanelOpen2) => null;
-  onMount(() => {
-    toggleScroll = (isPanelOpen2) => document.body.style.overflowY = isPanelOpen2 ? "hidden" : "";
+  let isDrawerOpen;
+  drawerStore.subscribe((val) => {
+    isDrawerOpen = val;
   });
-  if ($$props.load === void 0 && $$bindings.load && load2 !== void 0)
-    $$bindings.load(load2);
+  let windowWidth = 0;
+  let toggleScroll = (isDrawerOpen2) => null;
+  onMount(() => {
+    toggleScroll = (isDrawerOpen2) => document.body.style.overflowY = isDrawerOpen2 ? "hidden" : "";
+    windowWidth = window.innerWidth;
+    window.addEventListener("resize", (e) => {
+      var _a;
+      windowWidth = (_a = e === null || e === void 0 ? void 0 : e.target) === null || _a === void 0 ? void 0 : _a.innerWidth;
+    });
+  });
   $$result.css.add(css$5);
   {
-    toggleScroll(isPanelOpen);
+    toggleScroll(isDrawerOpen);
   }
-  return `<div class="${"profile-panel " + escape2("") + " svelte-110kyb5"}"><a class="${"header-link svelte-110kyb5"}" href="${"/"}">Ethan Olsen</a>
-	<p class="${"svelte-110kyb5"}">I am a full-stack web developer proficient in React and Typescript to build stable and
-		performant web and mobile applications.
-	</p>
+  return `${isDrawerOpen || windowWidth > 768 ? `<div class="${"profile-panel svelte-1hnllqq"}"><a class="${"header-link svelte-1hnllqq"}" href="${"/"}">Ethan Olsen</a>
+		<p class="${"svelte-1hnllqq"}">I am a full-stack web developer proficient in React and Typescript to build stable and
+			performant web and mobile applications.
+		</p>
 
-	<div class="${"page-links svelte-110kyb5"}"><a href="${"/"}" class="${"svelte-110kyb5"}"><span class="${"bullet svelte-110kyb5"}">\u2970</span> <span class="${"text"}">Home</span></a>
-		<a href="${"/about"}" class="${"svelte-110kyb5"}"><span class="${"bullet svelte-110kyb5"}">\u2970</span> <span class="${"text"}">About </span></a></div>
+		<div class="${"page-links svelte-1hnllqq"}"><a href="${"/"}" class="${"svelte-1hnllqq"}"><span class="${"bullet svelte-1hnllqq"}">\u2970</span> <span class="${"text"}">Home</span></a>
+			<a href="${"/about"}" class="${"svelte-1hnllqq"}"><span class="${"bullet svelte-1hnllqq"}">\u2970</span> <span class="${"text"}">About </span></a></div>
 
-	<div class="${"social-links svelte-110kyb5"}"><a class="${"social svelte-110kyb5"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"}"></path></svg></a>
-		<a class="${"social svelte-110kyb5"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"}"></path></svg></a>
-		<a class="${"social svelte-110kyb5"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-3 7h-1.924c-.615 0-1.076.252-1.076.889v1.111h3l-.238 3h-2.762v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z"}"></path></svg></a></div></div>
+		<div class="${"social-links svelte-1hnllqq"}"><a class="${"social svelte-1hnllqq"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"}"></path></svg></a>
+			<a class="${"social svelte-1hnllqq"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"}"></path></svg></a>
+			<a class="${"social svelte-1hnllqq"}" href="${"#"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" fill="${"currentColor"}" width="${"60%"}" height="${"60%"}" viewBox="${"0 0 24 24"}"><path d="${"M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-3 7h-1.924c-.615 0-1.076.252-1.076.889v1.111h3l-.238 3h-2.762v8h-3v-8h-2v-3h2v-1.923c0-2.022 1.064-3.077 3.461-3.077h2.539v3z"}"></path></svg></a></div></div>` : ``}
 
-<button class="${"mobile-nav svelte-110kyb5"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" width="${"50%"}" height="${"50%"}" fill-rule="${"evenodd"}" clip-rule="${"evenodd"}"><path d="${"M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z"}" fill="${"#1040e2"}"></path><path d="${"M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z"}"></path></svg>
+<button class="${"mobile-nav svelte-1hnllqq"}"><svg xmlns="${"http://www.w3.org/2000/svg"}" width="${"50%"}" height="${"50%"}" fill-rule="${"evenodd"}" clip-rule="${"evenodd"}"><path d="${"M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z"}" fill="${"#1040e2"}"></path><path d="${"M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z"}"></path></svg>
 </button>`;
 });
 var css$4 = {
