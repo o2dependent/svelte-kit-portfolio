@@ -30,7 +30,11 @@
 
 		window.addEventListener('resize', (e) => {
 			// @ts-ignore
-			windowWidth = e?.target?.innerWidth;
+			const width = e?.target?.innerWidth;
+			windowWidth = width;
+			if (isDrawerOpen && width > 768) {
+				toggleScroll(false);
+			}
 		});
 	});
 
@@ -128,8 +132,9 @@
 	}
 	@media screen and (max-width: 768px) {
 		.mobile-nav {
-			z-index: 9999;
 			all: unset;
+			z-index: 9999;
+			cursor: pointer;
 			border-radius: 9999px;
 			display: flex;
 			justify-content: center;
@@ -148,10 +153,6 @@
 			left: 0;
 			transition: left 300ms ease-out;
 			box-shadow: 0 0 3px #00000040;
-		}
-
-		.profile-panel.open {
-			left: 0;
 		}
 	}
 

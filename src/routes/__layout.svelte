@@ -23,7 +23,9 @@
 	}
 
 	main {
+		z-index: -9999;
 		background-color: var(--secondary-color);
+		transition: transform 500ms ease-out;
 		box-shadow: inset 0 0 5px #00000040;
 		flex: 1;
 		display: flex;
