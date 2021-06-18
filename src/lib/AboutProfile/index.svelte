@@ -1,7 +1,9 @@
 <script lang="ts">
+	let isPanelOpen = false;
+	$: document.body.style.overflowY = isPanelOpen ? 'hidden' : '';
 </script>
 
-<div class="profile-panel">
+<div class="profile-panel {isPanelOpen ? 'open' : ''}">
 	<a class="header-link" href="/">Ethan Olsen</a>
 	<p>
 		I am a full-stack web developer proficient in React and Typescript to build stable and
@@ -9,8 +11,12 @@
 	</p>
 
 	<div class="page-links">
-		<a href="/"><span class="bullet">⥰</span> <span class="text">Home</span></a>
-		<a href="/about"><span class="bullet">⥰</span> <span class="text">About </span></a>
+		<a on:click={() => (isPanelOpen = false)} href="/"
+			><span class="bullet">⥰</span> <span class="text">Home</span></a
+		>
+		<a on:click={() => (isPanelOpen = false)} href="/about"
+			><span class="bullet">⥰</span> <span class="text">About </span></a
+		>
 	</div>
 
 	<div class="social-links">
@@ -53,10 +59,24 @@
 	</div>
 </div>
 
+<button class="mobile-nav" on:click={() => (isPanelOpen = !isPanelOpen)}
+	><svg
+		xmlns="http://www.w3.org/2000/svg"
+		width="50%"
+		height="50%"
+		fill-rule="evenodd"
+		clip-rule="evenodd"
+		><path d="M24 18v1h-24v-1h24zm0-6v1h-24v-1h24zm0-6v1h-24v-1h24z" fill="#1040e2" /><path
+			d="M24 19h-24v-1h24v1zm0-6h-24v-1h24v1zm0-6h-24v-1h24v1z"
+		/></svg
+	>
+</button>
+
 <style>
 	.profile-panel {
 		background-color: var(--tertiary-color);
 		width: 350px;
+		max-width: 100vw;
 		min-height: 100vh;
 		height: 100%;
 		padding: 2rem;
@@ -67,6 +87,39 @@
 		position: sticky;
 		top: 0;
 	}
+	.mobile-nav {
+		display: none;
+	}
+	@media screen and (max-width: 768px) {
+		.mobile-nav {
+			z-index: 9999;
+			all: unset;
+			border-radius: 9999px;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			position: fixed;
+			bottom: 0.5rem;
+			right: 0.5rem;
+			height: 3rem;
+			width: 3rem;
+			background-color: var(--tertiary-color);
+			box-shadow: 0 0 5px #00000040;
+		}
+
+		.profile-panel {
+			position: fixed;
+			left: -100vw;
+			width: 100vw;
+			transition: left 300ms ease-out;
+			box-shadow: 0 0 3px #00000040;
+		}
+
+		.profile-panel.open {
+			left: 0;
+		}
+	}
+
 	.page-links {
 		display: flex;
 		flex-direction: column;
@@ -82,6 +135,7 @@
 	.page-links a:hover .bullet {
 		margin-right: 0.25rem;
 	}
+
 	.social-links {
 		margin-top: 1rem;
 		display: flex;

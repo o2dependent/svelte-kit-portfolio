@@ -16,6 +16,11 @@
 		width: 100vw;
 		min-height: 100vh;
 	}
+	@media screen and (max-width: 768px) {
+		.__layout {
+			flex-direction: column;
+		}
+	}
 
 	main {
 		background-color: var(--secondary-color);
