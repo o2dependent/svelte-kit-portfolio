@@ -1,6 +1,20 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
 	let isPanelOpen = false;
-	$: document ? (document.body.style.overflowY = isPanelOpen ? 'hidden' : '') : null;
+	let i = null;
+
+	export async function load(p) {
+		console.log(p);
+		i = p;
+	}
+
+	let toggleScroll = (isPanelOpen: boolean) => null;
+	onMount(() => {
+		toggleScroll = (isPanelOpen: boolean) =>
+			(document.body.style.overflowY = isPanelOpen ? 'hidden' : '');
+	});
+
+	$: toggleScroll(isPanelOpen);
 </script>
 
 <div class="profile-panel {isPanelOpen ? 'open' : ''}">
