@@ -6,14 +6,42 @@
 </script>
 
 <script lang="ts">
+	import images from '../dummydata/images';
+
+	import { crossfade, fade, scale } from 'svelte/transition';
+
+	const [send, receive] = crossfade({
+		duration: 500,
+		fallback: scale
+	});
+	// generate dummy data
 	let cards = new Array(10).fill(null).map((x, idx) => ({
+		id: idx,
 		title: `Title ${idx}`,
 		body: `Not a sunrise but a galaxyrise circumnavigated extraplanetary bits of moving fluff network of wormholes Flatland. Courage of our questions rich in heavy atoms across the centuries Jean-François Champollion vanquish the impossible something incredible is waiting to be known. Muse about invent the universe a mote of dust suspended in a sunbeam the only home we've ever known emerged into consciousness emerged into consciousness? With pretty stories for which there's little good evidence a mote of dust suspended in a sunbeam concept of the number one hearts of the stars hearts of the stars made in the interiors of collapsing stars and billions upon billions upon billions upon billions upon billions upon billions upon billions.`,
 		img: {
-			src: (w: number, h: number) => `https://source.unsplash.com/random/${w}x${h}`,
+			src: images[idx],
 			alt: 'Photo'
 		}
 	}));
+
+	/**
+	 * Preview photo handlers
+	 */
+	let selected: null | typeof cards[0] = null;
+	let loading: null | typeof cards[0] = null;
+
+	const load = (image) => {
+		loading = image;
+		const img = new Image();
+
+		img.onload = () => {
+			selected = image;
+			loading = null;
+		};
+
+		img.src = image.img.src;
+	};
 </script>
 
 <svelte:head>
@@ -23,14 +51,20 @@
 <Masonry bind:refreshLayout gridGap={'0.75rem'} colWidth={'minmax(Min(350px, 100%), 1fr)'}>
 	{#each cards as card}
 		<div class="card">
-			<img
-				on:load={refreshLayout}
-				src={card.img.src(
-					Math.floor(Math.random() * 350 + 350),
-					Math.floor(Math.random() * 350 + 350)
-				)}
-				alt={card.img.alt}
-			/>
+			<div class="img-container">
+				<img
+					id="{card.id} "
+					on:click={() => load(card)}
+					on:load={refreshLayout}
+					src={card.img.src}
+					alt={card.img.alt}
+				/>
+
+				{#if selected?.id !== card.id}
+					<div class="img-shadow" in:receive={{ key: card.id }} out:send={{ key: card.id }} />
+				{/if}
+			</div>
+
 			<div class="card__body">
 				<strong>{card.title}</strong>
 				<p>{card.body}</p>
@@ -38,6 +72,16 @@
 		</div>
 	{/each}
 </Masonry>
+
+{#if loading || selected}
+	<div in:fade out:fade class="photo" on:click={() => (selected = null)}>
+		{#if selected}
+			{#await selected then d}
+				<img in:receive={{ key: d.id }} out:send={{ key: d.id }} src={d.img.src} alt={d.img.alt} />
+			{/await}
+		{/if}
+	</div>
+{/if}
 
 <style>
 	.card {
@@ -66,5 +110,46 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	/* Card image */
+	.img-container {
+		position: relative;
+	}
+	.img-shadow {
+		position: absolute;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		z-index: -10;
+	}
+
+	/* Photo display */
+	.photo {
+		z-index: 9999;
+		background-color: #00000040;
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-direction: column;
+		will-change: transform;
+		overflow: hidden;
+	}
+
+	.photo img {
+		cursor: unset;
+		box-shadow: 0 0 10px #00000080;
+		max-width: 100vw;
+	}
+
+	img {
+		object-fit: cover;
+		cursor: pointer;
 	}
 </style>
