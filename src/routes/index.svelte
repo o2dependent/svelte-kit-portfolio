@@ -6,24 +6,14 @@
 </script>
 
 <script lang="ts">
-	import images from '../dummydata/images';
+	import cards from '../dummydata/cards';
 
 	import { crossfade, fade, scale } from 'svelte/transition';
 
 	const [send, receive] = crossfade({
-		duration: 500,
+		duration: 700,
 		fallback: scale
 	});
-	// generate dummy data
-	let cards = new Array(10).fill(null).map((x, idx) => ({
-		id: idx,
-		title: `Title ${idx}`,
-		body: `Not a sunrise but a galaxyrise circumnavigated extraplanetary bits of moving fluff network of wormholes Flatland. Courage of our questions rich in heavy atoms across the centuries Jean-François Champollion vanquish the impossible something incredible is waiting to be known. Muse about invent the universe a mote of dust suspended in a sunbeam the only home we've ever known emerged into consciousness emerged into consciousness? With pretty stories for which there's little good evidence a mote of dust suspended in a sunbeam concept of the number one hearts of the stars hearts of the stars made in the interiors of collapsing stars and billions upon billions upon billions upon billions upon billions upon billions upon billions.`,
-		img: {
-			src: images[idx],
-			alt: 'Photo'
-		}
-	}));
 
 	/**
 	 * Preview photo handlers
@@ -61,7 +51,11 @@
 				/>
 
 				{#if selected?.id !== card.id}
-					<div class="img-shadow" in:receive={{ key: card.id }} out:send={{ key: card.id }} />
+					<div
+						class="img-shadow"
+						in:receive|local={{ key: card.id }}
+						out:send|local={{ key: card.id }}
+					/>
 				{/if}
 			</div>
 
@@ -77,7 +71,12 @@
 	<div in:fade out:fade class="photo" on:click={() => (selected = null)}>
 		{#if selected}
 			{#await selected then d}
-				<img in:receive={{ key: d.id }} out:send={{ key: d.id }} src={d.img.src} alt={d.img.alt} />
+				<img
+					in:receive={{ key: d.id }}
+					out:send={{ key: d.id, duration: 300 }}
+					src={d.img.src}
+					alt={d.img.alt}
+				/>
 			{/await}
 		{/if}
 	</div>

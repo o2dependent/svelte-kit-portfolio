@@ -1,7 +1,7 @@
 <script lang="ts">
 	import AboutProfile from '$lib/AboutProfile/index.svelte';
 	import '../app.css';
-	import { fly, slide, scale } from 'svelte/transition';
+	import { fly, fade, scale } from 'svelte/transition';
 	import { bounceOut, cubicIn, cubicInOut, circOut } from 'svelte/easing';
 	import { drawerStore } from '../stores/drawerStore';
 	import { onMount } from 'svelte';
@@ -20,24 +20,11 @@
 		}
 	};
 
-	let windowWidth = 0;
-
 	let toggleScroll = (isDrawerOpen: boolean) => null;
 
 	onMount(() => {
 		toggleScroll = (isDrawerOpen: boolean) =>
 			(document.body.style.overflowY = isDrawerOpen ? 'hidden' : '');
-
-		windowWidth = window.innerWidth;
-
-		window.addEventListener('resize', (e) => {
-			// @ts-ignore
-			const width = e?.target?.innerWidth;
-			windowWidth = width;
-			if (isDrawerOpen && width > 768) {
-				toggleScroll(false);
-			}
-		});
 	});
 
 	$: toggleScroll(isDrawerOpen);
@@ -58,12 +45,15 @@
 		>
 	</button>
 
-	<!-- drawer -->
-	{#if isDrawerOpen || windowWidth > 768}
-		<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel">
+	<!-- drawer mobil -->
+	{#if isDrawerOpen}
+		<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel mobile">
 			<AboutProfile />
 		</div>
 	{/if}
+	<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel desktop">
+		<AboutProfile />
+	</div>
 
 	<main>
 		<slot />
@@ -96,10 +86,20 @@
 		position: sticky;
 		top: 0;
 	}
+	.profile-panel.mobile {
+		display: none;
+	}
 	.mobile-nav {
 		display: none;
 	}
 	@media screen and (max-width: 768px) {
+		.profile-panel.mobile {
+			display: flex;
+		}
+		.profile-panel.desktop {
+			display: none;
+		}
+
 		.profile-panel {
 			z-index: 999;
 		}
