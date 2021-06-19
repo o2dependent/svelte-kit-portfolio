@@ -31,7 +31,7 @@
 </script>
 
 <div class="__layout">
-	<!-- Mobile FAB -->
+	<!-- mobile FAB -->
 	<button class="mobile-nav" on:click={() => toggleDrawer()}
 		><svg
 			xmlns="http://www.w3.org/2000/svg"
@@ -45,22 +45,27 @@
 		>
 	</button>
 
-	<!-- drawer mobil -->
+	<!-- drawer mobile -->
 	{#if isDrawerOpen}
 		<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel mobile">
 			<AboutProfile />
 		</div>
 	{/if}
-	<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel desktop">
+	<!-- drawer desktop -->
+	<div class="profile-panel desktop">
 		<AboutProfile />
 	</div>
 
+	<!-- route slot -->
 	<main>
 		<slot />
 	</main>
 </div>
 
 <style>
+	:global(body) {
+		max-width: 100vw;
+	}
 	.__layout {
 		display: flex;
 		width: 100vw;
@@ -138,5 +143,6 @@
 		width: 100%;
 		box-sizing: border-box;
 		padding-top: 28px;
+		position: relative;
 	}
 </style>

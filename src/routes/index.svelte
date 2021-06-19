@@ -57,6 +57,13 @@
 						out:send|local={{ key: card.id }}
 					/>
 				{/if}
+				<div class="zoom" on:click={() => load(card)}>
+					<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24"
+						><path
+							d="M21.172 24l-7.387-7.387c-1.388.874-3.024 1.387-4.785 1.387-4.971 0-9-4.029-9-9s4.029-9 9-9 9 4.029 9 9c0 1.761-.514 3.398-1.387 4.785l7.387 7.387-2.828 2.828zm-12.172-8c3.859 0 7-3.14 7-7s-3.141-7-7-7-7 3.14-7 7 3.141 7 7 7z"
+						/></svg
+					>
+				</div>
 			</div>
 
 			<div class="card__body">
@@ -71,12 +78,7 @@
 	<div in:fade out:fade class="photo" on:click={() => (selected = null)}>
 		{#if selected}
 			{#await selected then d}
-				<img
-					in:receive={{ key: d.id }}
-					out:send={{ key: d.id, duration: 300 }}
-					src={d.img.src}
-					alt={d.img.alt}
-				/>
+				<img in:receive={{ key: d.id }} src={d.img.src} alt={d.img.alt} />
 			{/await}
 		{/if}
 	</div>
@@ -87,6 +89,7 @@
 		width: 100%;
 		background-color: white;
 		box-shadow: 0 0 5px #00000040;
+		position: relative;
 	}
 
 	.card__body {
@@ -109,6 +112,17 @@
 		-webkit-box-orient: vertical;
 		overflow: hidden;
 		text-overflow: ellipsis;
+	}
+
+	.zoom {
+		position: absolute;
+		top: 0;
+		right: 0;
+		padding: 0.5rem;
+		border-bottom-left-radius: 16px;
+		background-color: var(--secondary-color);
+		box-shadow: inset 0 0 5px #00000020;
+		cursor: pointer;
 	}
 
 	/* Card image */
@@ -142,9 +156,10 @@
 	}
 
 	.photo img {
-		cursor: unset;
+		cursor: default;
 		box-shadow: 0 0 10px #00000080;
 		max-width: 100vw;
+		max-height: 100vh;
 	}
 
 	img {
