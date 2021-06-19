@@ -3,12 +3,62 @@
 
 	export const prerender = true;
 	let refreshLayout;
+
+	interface PhotoCard {
+		photo: {
+			url: string;
+			blurhash: string;
+			width: number;
+			height: number;
+			alt: string;
+		};
+		id: string;
+		description: string;
+		title: string;
+	}
+
+	interface AllPhotoCards {
+		allPhotoCards: PhotoCard[];
+	}
+
+	/**
+	 * @type {import('@sveltejs/kit').Load}
+	 */
+	export async function load({ page, fetch, session, context }) {
+		const data = await fetchDato<AllPhotoCards>(`
+			query PhotoCards {
+				allPhotoCards {
+					photo {
+						url(imgixParams: {auto: enhance})
+						blurhash
+						width
+						height
+						alt
+					}
+					id
+					description
+					title
+				}
+			}
+		`);
+
+		if (data) {
+			return {
+				props: {
+					allPhotoCards: data?.allPhotoCards || []
+				}
+			};
+		}
+	}
 </script>
 
 <script lang="ts">
-	import cards from '../dummydata/cards';
-
 	import { crossfade, fade, scale } from 'svelte/transition';
+	import fetchDato from '../utils/fetchDato';
+
+	export let allPhotoCards: PhotoCard[] | [] = [];
+
+	console.log(allPhotoCards);
 
 	const [send, receive] = crossfade({
 		duration: 700,
@@ -18,10 +68,10 @@
 	/**
 	 * Preview photo handlers
 	 */
-	let selected: null | typeof cards[0] = null;
-	let loading: null | typeof cards[0] = null;
+	let selected: null | PhotoCard = null;
+	let loading: null | PhotoCard = null;
 
-	const load = (image) => {
+	const load = (image: PhotoCard) => {
 		loading = image;
 		const img = new Image();
 
@@ -30,7 +80,7 @@
 			loading = null;
 		};
 
-		img.src = image.img.src;
+		img.src = image.photo.url;
 	};
 </script>
 
@@ -39,15 +89,15 @@
 </svelte:head>
 
 <Masonry bind:refreshLayout gridGap={'0.75rem'} colWidth={'minmax(Min(350px, 100%), 1fr)'}>
-	{#each cards as card}
+	{#each allPhotoCards as card}
 		<div class="card">
 			<div class="img-container">
 				<img
 					id="{card.id} "
 					on:click={() => load(card)}
 					on:load={refreshLayout}
-					src={card.img.src}
-					alt={card.img.alt}
+					src={card.photo.url}
+					alt={card.photo.alt}
 				/>
 
 				{#if selected?.id !== card.id}
@@ -68,7 +118,7 @@
 
 			<div class="card__body">
 				<strong>{card.title}</strong>
-				<p>{card.body}</p>
+				<p>{card.description}</p>
 			</div>
 		</div>
 	{/each}
@@ -78,7 +128,7 @@
 	<div in:fade out:fade class="photo" on:click={() => (selected = null)}>
 		{#if selected}
 			{#await selected then d}
-				<img in:receive={{ key: d.id }} src={d.img.src} alt={d.img.alt} />
+				<img in:receive={{ key: d.id }} src={d.photo.url} alt={d.photo.alt} />
 			{/await}
 		{/if}
 	</div>

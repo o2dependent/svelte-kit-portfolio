@@ -1,17 +1,41 @@
-<script context="module">
+<script context="module" lang="ts">
 	import { browser, dev } from '$app/env';
-
-	// we don't need any JS on this page, though we'll load
-	// it in dev so that we get hot module replacement...
-	export const hydrate = dev;
-
-	// ...but if the client-side router is already loaded
-	// (i.e. we came here from elsewhere in the app), use it
-	export const router = browser;
+	import fetchDato from '../utils/fetchDato';
 
 	// since there's no dynamic data here, we can prerender
 	// it so that it gets served as a static asset in prod
 	export const prerender = true;
+
+	interface AboutPage {
+		aboutPage: {
+			content: string;
+		};
+	}
+
+	/**
+	 * @type {import('@sveltejs/kit).Load}
+	 */
+	export async function load() {
+		const data = await fetchDato<AboutPage>(`
+				query AboutPage {
+					aboutPage {
+						content(markdown: true)
+					}
+				}
+		`);
+
+		if (data) {
+			return {
+				props: {
+					content: data?.aboutPage?.content || ''
+				}
+			};
+		}
+	}
+</script>
+
+<script lang="ts">
+	export let content: string = '';
 </script>
 
 <svelte:head>
@@ -19,23 +43,7 @@
 </svelte:head>
 
 <div class="content">
-	<h1>About me</h1>
-
-	<p>
-		This is a <a href="https://kit.svelte.dev">SvelteKit</a> app. You can make your own by typing the
-		following into your command line and following the prompts:
-	</p>
-
-	<p>
-		The page you're looking at is purely static HTML, with no client-side interactivity needed.
-		Because of that, we don't need to load any JavaScript. Try viewing the page's source, or opening
-		the devtools network panel and reloading.
-	</p>
-
-	<p>
-		The page illustrates SvelteKit's data loading and form handling. Try using it with JavaScript
-		disabled!
-	</p>
+	{@html content}
 </div>
 
 <style>
@@ -46,6 +54,18 @@
 		display: flex;
 		flex-direction: column;
 		gap: 0.5rem;
+	}
+	:global(.content *) {
+		text-align: start;
+		margin: 0;
+		margin-bottom: 0.15rem;
+	}
+	:global(.content h1) {
+		font-weight: 700;
+		margin-bottom: 0.5rem;
+	}
+	:global(.content img) {
+		box-shadow: 0 0 5px #00000080;
 	}
 	h1,
 	p,

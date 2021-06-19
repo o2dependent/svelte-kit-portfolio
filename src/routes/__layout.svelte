@@ -1,3 +1,53 @@
+<script context="module" lang="ts">
+	export const prerender = true;
+
+	/**
+	 * @type {import('@sveltejs/kit').Load}
+	 */
+	export async function load({ page, fetch, session, context }) {
+		console.log('ABOUT PANEL');
+		const data = await fetchDato<AboutPanelData>(`
+				query AboutPanel {
+					aboutPanel {
+						linkedin
+						instagram
+						id
+						headerText
+						facebook
+						description(markdown: true)
+					}
+				}
+		`);
+
+		if (data) {
+			return {
+				props: {
+					aboutPanel: data?.aboutPanel || {
+						linkedin: '',
+						instagram: '',
+						id: '',
+						headerText: '',
+						facebook: '',
+						description: ''
+					}
+				}
+			};
+		}
+		return {
+			props: {
+				aboutPanel: {
+					linkedin: '',
+					instagram: '',
+					id: '',
+					headerText: 'Welcome',
+					facebook: '',
+					description: ''
+				}
+			}
+		};
+	}
+</script>
+
 <script lang="ts">
 	import AboutProfile from '$lib/AboutProfile/index.svelte';
 	import '../app.css';
@@ -5,6 +55,17 @@
 	import { circOut } from 'svelte/easing';
 	import { drawerStore } from '../stores/drawerStore';
 	import { onMount } from 'svelte';
+	import fetchDato from '../utils/fetchDato';
+	import type { AboutPanel, AboutPanelData } from 'src/global';
+
+	export let aboutPanel: AboutPanel = {
+		linkedin: '',
+		instagram: '',
+		id: '',
+		headerText: '',
+		facebook: '',
+		description: ''
+	};
 
 	let isDrawerOpen: boolean;
 
@@ -48,12 +109,12 @@
 	<!-- drawer mobile -->
 	{#if isDrawerOpen}
 		<div transition:fly={{ x: -400, easing: circOut }} class="profile-panel mobile">
-			<AboutProfile />
+			<AboutProfile {aboutPanel} />
 		</div>
 	{/if}
 	<!-- drawer desktop -->
 	<div class="profile-panel desktop">
-		<AboutProfile />
+		<AboutProfile {aboutPanel} />
 	</div>
 
 	<!-- route slot -->
@@ -66,9 +127,10 @@
 	:global(body) {
 		max-width: 100vw;
 	}
+
 	.__layout {
 		display: flex;
-		width: 100vw;
+		max-width: 100vw;
 		min-height: 100vh;
 	}
 	@media screen and (max-width: 768px) {

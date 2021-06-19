@@ -1,5 +1,16 @@
 <script lang="ts">
+	import type { AboutPanel } from 'src/global';
+
 	import { drawerStore } from '../../stores/drawerStore';
+
+	export let aboutPanel: AboutPanel = {
+		linkedin: '',
+		instagram: '',
+		id: '',
+		headerText: '',
+		facebook: '',
+		description: ''
+	};
 
 	let isDrawerOpen: boolean;
 
@@ -16,11 +27,9 @@
 	};
 </script>
 
-<a class="header-link" href="/">Ethan Olsen</a>
-<p>
-	I am a full-stack web developer proficient in React and Typescript to build stable and performant
-	web and mobile applications.
-</p>
+<a class="header-link" href="/">{aboutPanel?.headerText}</a>
+
+{@html aboutPanel?.description}
 
 <div class="page-links">
 	<a on:click={() => toggleDrawer(false)} href="/"
@@ -32,7 +41,7 @@
 </div>
 
 <div class="social-links">
-	<a class="social" href="#">
+	<a class="social" href={aboutPanel?.instagram}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
@@ -44,7 +53,7 @@
 			/></svg
 		>
 	</a>
-	<a class="social" href="#">
+	<a class="social" href={aboutPanel?.linkedin}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
@@ -56,7 +65,7 @@
 			/></svg
 		>
 	</a>
-	<a class="social" href="#">
+	<a class="social" href={aboutPanel?.facebook}>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			fill="currentColor"
@@ -107,6 +116,9 @@
 	}
 	.social:hover {
 		opacity: 1;
+	}
+	.social[href=''] {
+		display: none;
 	}
 	.header-link {
 		font-size: 1.15rem;

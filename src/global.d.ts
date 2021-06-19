@@ -9,3 +9,16 @@ export interface Card {
 		alt: string;
 	};
 }
+
+export interface AboutPanel {
+	linkedin: string;
+	instagram: string;
+	id: string;
+	headerText: string;
+	facebook: string;
+	description: string;
+}
+
+export interface AboutPanelData {
+	aboutPanel: AboutPanel;
+}
