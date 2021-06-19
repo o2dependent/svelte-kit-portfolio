@@ -1,8 +1,8 @@
 <script lang="ts">
 	import AboutProfile from '$lib/AboutProfile/index.svelte';
 	import '../app.css';
-	import { fly, fade, scale } from 'svelte/transition';
-	import { bounceOut, cubicIn, cubicInOut, circOut } from 'svelte/easing';
+	import { fly } from 'svelte/transition';
+	import { circOut } from 'svelte/easing';
 	import { drawerStore } from '../stores/drawerStore';
 	import { onMount } from 'svelte';
 
